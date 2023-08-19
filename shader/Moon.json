@@ -1,0 +1,63 @@
+{
+  "id": 4111,
+  "name": "Moon",
+  "fragment": "#extension GL_OES_standard_derivatives : enable\n\nprecision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nuniform vec3 cameraPosition;\nuniform float time;\nuniform sampler2D envMap;\nuniform sampler2D backfaceMap;\nuniform vec2 resolution;\nuniform vec3 color;\nuniform float start;\nuniform float end;\nuniform float alpha;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvarying vec2 vUv;\nvarying vec2 vUv2;\nvarying vec3 worldNormal;\nvarying vec3 viewDirection;\nfloat ior = 2.417;\nfloat a = 0.33;\nvec3 reflectionColor = vec3(1.0);\nfloat fresnelFunc(vec3 viewDirection, vec3 worldNormal) \n                                                                                                {\n                                                                                                    return pow(0.5, 2.0);\n                                                                                                }\nvarying vec3 fPosition;\nvarying vec3 fNormal;\nvec4 A_test1576663258235_90_main() \n                                                                                                {\n                                                                                                    vec4 A_test1576663258235_90_gl_FragColor = vec4(0.0);\n                                                                                                    vec2 uv = gl_FragCoord.xy / resolution;\n                                                                                                    vec3 backfaceNormal = texture2D(backfaceMap, uv).rgb;\n                                                                                                    vec3 normal = worldNormal * (1.0 - a) - backfaceNormal * a;\n                                                                                                    vec3 refracted = refract(viewDirection, normal, 0.98 / ior);\n                                                                                                    uv += refracted.xy;\n                                                                                                    float rOffset = 0.000;\n                                                                                                    float gOffset = 0.000;\n                                                                                                    float bOffset = 0.000;\n                                                                                                    vec4 rValue = texture2D(envMap, uv - rOffset, 1.0);\n                                                                                                    vec4 gValue = texture2D(envMap, uv - gOffset, 1.0);\n                                                                                                    vec4 bValue = texture2D(envMap, uv - bOffset, 1.0);\n                                                                                                    vec4 tex = vec4(rValue.r, gValue.g, bValue.b, 1.0);\n                                                                                                    float fresnel = fresnelFunc(viewDirection, normal);\n                                                                                                    vec4 color = tex;\n                                                                                                    color.rgb = mix(color.rgb, reflectionColor, fresnel);\n                                                                                                    A_test1576663258235_90_gl_FragColor = vec4(color.rgb * 1.0, 1.0);\n                                                                                                    return A_test1576663258235_90_gl_FragColor *= 1.0;\n                                                                                                }\nvec4 fresnel_glow1576663272301_105_main() \n                                                                                                {\n                                                                                                    vec4 fresnel_glow1576663272301_105_gl_FragColor = vec4(0.0);\n                                                                                                    vec3 normal = normalize(fNormal);\n                                                                                                    vec3 eye = normalize(-fPosition.xyz);\n                                                                                                    float rim = smoothstep(start, end, 1.0 - dot(normal, eye));\n                                                                                                    fresnel_glow1576663272301_105_gl_FragColor = vec4(clamp(rim, 0.0, 1.0) * alpha * color, 1.0);\n                                                                                                    return fresnel_glow1576663272301_105_gl_FragColor *= 1.0;\n                                                                                                }\nvoid main() \n                                                                                                {\n                                                                                                    gl_FragColor = (A_test1576663258235_90_main() + fresnel_glow1576663272301_105_main());                                                                                                }\n",
+  "vertex": "precision highp float;\nprecision highp int;\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nuniform vec3 cameraPosition;\nuniform float time;\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvarying vec2 vUv;\nvarying vec2 vUv2;\nvarying vec3 worldNormal;\nvarying vec3 viewDirection;\nvarying vec3 fNormal;\nvarying vec3 fPosition;\nvec4 A_test1576663258235_90_main() \n                                                                                                {\n                                                                                                    vec4 A_test1576663258235_90_gl_Position = vec4(0.0);\n                                                                                                    vec4 transformedNormal = vec4(normal, 0.);\n                                                                                                    vec4 transformedPosition = vec4(position, 1.0);\n                                                                                                    vec4 worldPosition = modelMatrix * vec4(position, 1.0);\n                                                                                                    worldNormal = normalize(modelViewMatrix * transformedNormal).xyz;\n                                                                                                    viewDirection = normalize(worldPosition.xyz - cameraPosition);\n                                                                                                    ;\n                                                                                                    A_test1576663258235_90_gl_Position = projectionMatrix * modelViewMatrix * transformedPosition;\n                                                                                                    return A_test1576663258235_90_gl_Position *= 1.0;\n                                                                                                }\nvec4 fresnel_glow1576663272301_105_main() \n                                                                                                {\n                                                                                                    vec4 fresnel_glow1576663272301_105_gl_Position = vec4(0.0);\n                                                                                                    fNormal = normalize(normalMatrix * normal);\n                                                                                                    vec4 pos = modelViewMatrix * vec4(position, 1.0);\n                                                                                                    fPosition = pos.xyz;\n                                                                                                    fresnel_glow1576663272301_105_gl_Position = projectionMatrix * pos;\n                                                                                                    return fresnel_glow1576663272301_105_gl_Position *= 1.0;\n                                                                                                }\nvoid main() \n                                                                                                {\n                                                                                                    gl_Position = A_test1576663258235_90_main() + fresnel_glow1576663272301_105_main();                                                                                                }\n",
+  "uniforms": {
+    "cameraPosition": {
+      "type": "v3",
+      "glslType": "vec3"
+    },
+    "time": {
+      "type": "f",
+      "glslType": "float"
+    },
+    "envMap": {
+      "value": null,
+      "type": "t",
+      "glslType": "sampler2D"
+    },
+    "backfaceMap": {
+      "value": null,
+      "type": "t",
+      "glslType": "sampler2D"
+    },
+    "resolution": {
+      "value": {
+        "x": "500",
+        "y": "800"
+      },
+      "type": "v2",
+      "glslType": "vec2"
+    },
+    "color": {
+      "value": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "type": "c",
+      "glslType": "vec3"
+    },
+    "start": {
+      "value": "-0.1339231",
+      "type": "f",
+      "glslType": "float"
+    },
+    "end": {
+      "value": "1",
+      "type": "f",
+      "glslType": "float"
+    },
+    "alpha": {
+      "value": "0.67760445",
+      "type": "f",
+      "glslType": "float"
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/4111",
+  "user": {
+    "username": "AdrienGENEST",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}
